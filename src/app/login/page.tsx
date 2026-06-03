@@ -37,13 +37,13 @@ export default function Login() {
 
       if (error) {
         setErrorMsg("Credenciales incorrectas. Inténtalo de nuevo.");
+        setLoading(false);
       } else if (data.user) {
         router.push("/");
-        router.refresh();
       }
     } catch (err: any) {
+      console.error("Error en login:", err);
       setErrorMsg("Error de conexión al iniciar sesión.");
-    } finally {
       setLoading(false);
     }
   };
