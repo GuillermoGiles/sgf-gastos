@@ -30,6 +30,20 @@ export default function Home() {
     checkSession();
   }, [router]);
 
+  useEffect(() => {
+    if (showLogoutConfirm) {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, [showLogoutConfirm]);
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();

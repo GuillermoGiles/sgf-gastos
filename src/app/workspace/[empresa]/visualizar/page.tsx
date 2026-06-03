@@ -64,9 +64,9 @@ export default function VisualizarPage() {
 
   const [visibleCount, setVisibleCount] = useState(20);
 
-  // Bloqueo estricto de scroll en móviles al abrir el modal de filtros o edición
+  // Bloqueo estricto de scroll en móviles al abrir modales
   useEffect(() => {
-    if (showFilters || showEditModal || showDeleteConfirm) {
+    if (showFilters || showEditModal || showDeleteConfirm || showLogoutConfirm) {
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
     } else {
@@ -77,7 +77,7 @@ export default function VisualizarPage() {
       document.documentElement.style.overflow = '';
       document.body.style.overflow = ''; 
     };
-  }, [showFilters, showEditModal, showDeleteConfirm]);
+  }, [showFilters, showEditModal, showDeleteConfirm, showLogoutConfirm]);
 
   const fetchMovimientos = useCallback(async () => {
     setLoading(true);

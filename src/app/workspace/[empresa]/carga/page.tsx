@@ -43,7 +43,7 @@ export default function CargaPage() {
   }, []);
 
   useEffect(() => {
-    if (showModal) {
+    if (showModal || showLogoutConfirm) {
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
     } else {
@@ -54,7 +54,7 @@ export default function CargaPage() {
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
     };
-  }, [showModal]);
+  }, [showModal, showLogoutConfirm]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
