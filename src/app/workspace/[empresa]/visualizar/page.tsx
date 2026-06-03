@@ -558,7 +558,7 @@ export default function VisualizarPage() {
                         <td className="px-4 py-3">{m.categoria}</td>
                         <td className="px-4 py-3 text-gray-500">{m.descripcion}</td>
                         <td className={`px-4 py-3 text-right font-bold ${m.tipo_movimiento === 'Ingreso' ? 'text-green-600' : 'text-red-600'}`}>
-                          {m.moneda} {m.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                          {m.moneda} ${m.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -578,7 +578,7 @@ export default function VisualizarPage() {
                     <div className="flex justify-between items-start">
                       <span className="text-sm font-bold text-gray-900">{formatearFechaEs(m.fecha)}</span>
                       <span className={`text-base font-bold ${m.tipo_movimiento === 'Ingreso' ? 'text-green-600' : 'text-red-600'}`}>
-                        {m.moneda} {m.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                        {m.moneda} ${m.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     
