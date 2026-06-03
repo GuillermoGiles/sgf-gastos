@@ -410,15 +410,15 @@ export default function VisualizarPage() {
     }
   };
 
-  const inputBaseClass = "w-full p-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 transition-all text-sm disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed";
+  const inputBaseClass = "w-full p-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 transition-all text-[16px] disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed";
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-900 flex flex-col items-center p-4 sm:p-6 font-sans w-full max-w-[100vw]">
-      <div className="w-full max-w-[95%] 2xl:max-w-[1500px] bg-white rounded-2xl border border-gray-200 p-6 shadow-xl relative mt-2">
+    <main className="min-h-screen bg-gray-50 text-gray-900 flex flex-col items-center p-4 sm:p-6 font-sans w-full max-w-[100vw] overflow-x-hidden">
+      <div className="w-full max-w-md xl:max-w-[95%] 2xl:max-w-[1500px] bg-white rounded-2xl border border-gray-200 p-6 shadow-xl relative mt-2">
         
         <div className="flex justify-between items-start mb-1 pt-1">
-          <div className="flex flex-col">
-            <h1 className="text-3xl font-extrabold text-blue-950 tracking-wide">
+          <div className="flex flex-col pr-2 truncate">
+            <h1 className="text-3xl font-extrabold text-blue-950 tracking-wide truncate">
               {empresaNombre}
             </h1>
           </div>

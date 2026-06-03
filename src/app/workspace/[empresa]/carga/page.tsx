@@ -131,7 +131,7 @@ export default function CargaPage() {
     }
   };
 
-  const inputBaseClass = "w-full p-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 transition-all text-sm";
+  const inputBaseClass = "w-full p-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 transition-all text-[16px]";
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900 flex flex-col items-center p-4 sm:p-6 font-sans overflow-x-hidden w-full max-w-[100vw]">
