@@ -261,7 +261,7 @@ export default function CargaPage() {
               <div className="pt-3 mt-1 border-t border-gray-200 flex justify-between text-base text-gray-900">
                 <strong>Total a cargar:</strong>
                 <span className={`font-bold ${formData.tipoMovimiento === 'Ingreso' ? 'text-green-700' : 'text-red-700'}`}>
-                  {formData.moneda} {parseFloat(formData.monto).toFixed(2)}
+                  {formData.moneda} ${parseFloat(formData.monto || "0").toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
             </div>
