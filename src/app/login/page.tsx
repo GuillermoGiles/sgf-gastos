@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -10,6 +10,19 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push("/");
+      } else {
+        setIsCheckingAuth(false);
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +47,14 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  if (isCheckingAuth) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4 w-full">
+        <div className="text-gray-500 font-medium animate-pulse">Verificando acceso...</div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans w-full">

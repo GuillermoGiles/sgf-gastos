@@ -16,6 +16,19 @@ const empresas = [
 export default function Home() {
   const router = useRouter();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
+      } else {
+        setIsCheckingAuth(false);
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const handleSignOut = async () => {
     try {
@@ -26,6 +39,14 @@ export default function Home() {
       console.error("Error al cerrar sesión:", error);
     }
   };
+
+  if (isCheckingAuth) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-gray-500 font-medium animate-pulse">Cargando entorno...</div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center p-4 sm:p-6 font-sans w-full">
