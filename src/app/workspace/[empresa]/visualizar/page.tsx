@@ -477,7 +477,7 @@ export default function VisualizarPage() {
             <p className="text-xs font-bold text-blue-300 mb-2 uppercase tracking-wide">Sumatoria por Divisa:</p>
             <div className="flex flex-col gap-1.5 text-sm font-semibold">
               <span className={totalArs >= 0 ? "text-green-400" : "text-red-400"}>ARS ${totalArs.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
-              <span className={totalUsd >= 0 ? "text-green-400" : "text-red-400"}>USD ${totalUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span className={totalUsd >= 0 ? "text-green-400" : "text-red-400"}>USD ${totalUsd.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
           
@@ -485,7 +485,7 @@ export default function VisualizarPage() {
             <p className="text-xs font-bold text-blue-300 mb-2 uppercase tracking-wide">Gran Total Convertido:</p>
             <div className="flex flex-col gap-1.5 text-base font-bold">
               <span className={granTotalARS >= 0 ? "text-green-400" : "text-red-400"}>ARS ${granTotalARS.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
-              <span className={granTotalUSD >= 0 ? "text-green-400" : "text-red-400"}>USD ${granTotalUSD.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span className={granTotalUSD >= 0 ? "text-green-400" : "text-red-400"}>USD ${granTotalUSD.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
             </div>
             {!loadingTasa && (
               <p className="text-[10px] text-blue-400 mt-3 font-medium uppercase tracking-wider bg-blue-900/50 p-2 rounded border border-blue-800/50 text-center md:text-left md:bg-transparent md:p-0 md:border-0 md:mt-3">
