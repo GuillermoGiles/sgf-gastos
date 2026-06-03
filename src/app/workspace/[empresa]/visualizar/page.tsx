@@ -13,6 +13,7 @@ interface Movimiento {
   descripcion: string;
   moneda: string;
   monto: number;
+  empresa: string;
 }
 
 export default function VisualizarPage() {
