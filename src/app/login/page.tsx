@@ -117,10 +117,6 @@ export default function Login() {
             )}
           </button>
         </form>
-
-        <p className="text-center text-xs text-gray-400 mt-8">
-          Acceso exclusivo para administradores
-        </p>
       </div>
     </main>
   );
