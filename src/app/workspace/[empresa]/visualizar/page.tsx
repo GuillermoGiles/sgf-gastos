@@ -32,6 +32,7 @@ export default function VisualizarPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -423,19 +424,43 @@ export default function VisualizarPage() {
             </h1>
           </div>
           
-          <div className="flex space-x-2">
-            <Link 
-              href="/"
-              className="flex items-center justify-center px-3 py-1.5 bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 rounded-md text-xs font-bold uppercase tracking-wider transition-colors shadow-sm flex-1 sm:flex-none"
-            >
-              Cambiar
-            </Link>
+          <div className="relative">
             <button 
-              onClick={() => setShowLogoutConfirm(true)} 
-              className="flex items-center justify-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 rounded-md text-xs font-bold uppercase tracking-wider transition-colors shadow-sm flex-1 sm:flex-none"
+              onClick={() => setShowMenu(!showMenu)}
+              className="flex items-center justify-center p-2 bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 rounded-md transition-colors shadow-sm"
+              title="Menú de opciones"
             >
-              Salir
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+              </svg>
             </button>
+            
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)}></div>
+                <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-xl border border-gray-200 z-50 flex flex-col overflow-hidden animate-fade-in">
+                  <Link 
+                    href="/"
+                    onClick={() => setShowMenu(false)}
+                    className="flex items-center gap-2 px-4 py-3 text-left text-sm font-bold text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                    </svg>
+                    Cambiar
+                  </Link>
+                  <button 
+                    onClick={() => { setShowMenu(false); setShowLogoutConfirm(true); }} 
+                    className="flex items-center gap-2 px-4 py-3 text-left text-sm font-bold text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+                    </svg>
+                    Salir
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
