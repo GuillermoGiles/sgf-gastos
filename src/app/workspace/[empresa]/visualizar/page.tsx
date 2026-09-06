@@ -317,14 +317,14 @@ export default function VisualizarPage() {
 
   const movimientosVisibles = movimientosFiltrados.slice(0, visibleCount);
 
-  // Lógica Inversa Solicitada: Total = Egresos - Ingresos
+  // Total = Ingresos - Egresos (balance positivo)
   const totalArs = movimientosFiltrados
     .filter(m => m.moneda === "ARS")
-    .reduce((acc, curr) => acc + (curr.tipo_movimiento === "Egreso" ? curr.monto : -curr.monto), 0);
+    .reduce((acc, curr) => acc + (curr.tipo_movimiento === "Ingreso" ? curr.monto : -curr.monto), 0);
   
   const totalUsd = movimientosFiltrados
     .filter(m => m.moneda === "USD")
-    .reduce((acc, curr) => acc + (curr.tipo_movimiento === "Egreso" ? curr.monto : -curr.monto), 0);
+    .reduce((acc, curr) => acc + (curr.tipo_movimiento === "Ingreso" ? curr.monto : -curr.monto), 0);
 
   const granTotalARS = totalArs + (totalUsd * tasaUsd);
   const granTotalUSD = granTotalARS / tasaUsd;
@@ -341,8 +341,8 @@ export default function VisualizarPage() {
     const movs = movimientos.filter(m => m.empresa === empId);
     let tArs = 0; let tUsd = 0;
     movs.forEach(m => {
-      // Lógica Inversa Solicitada: Total = Egresos - Ingresos
-      const factor = m.tipo_movimiento === "Egreso" ? 1 : -1;
+      // Total = Ingresos - Egresos (balance positivo)
+      const factor = m.tipo_movimiento === "Ingreso" ? 1 : -1;
       if (m.moneda === "ARS") tArs += m.monto * factor;
       if (m.moneda === "USD") tUsd += m.monto * factor;
     });
