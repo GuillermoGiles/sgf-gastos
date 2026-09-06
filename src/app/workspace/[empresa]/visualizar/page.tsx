@@ -40,6 +40,15 @@ export default function VisualizarPage() {
   const [movimientoAEliminar, setMovimientoAEliminar] = useState<Movimiento | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Estados para eliminar por fecha
+  const [showDeleteByDateModal, setShowDeleteByDateModal] = useState(false);
+  const [deleteByDateMode, setDeleteByDateMode] = useState<'exacta' | 'rango'>('exacta');
+  const [deleteFechaExacta, setDeleteFechaExacta] = useState('');
+  const [deleteFechaDesde, setDeleteFechaDesde] = useState('');
+  const [deleteFechaHasta, setDeleteFechaHasta] = useState('');
+  const [isDeletingByDate, setIsDeletingByDate] = useState(false);
+  const [deleteByDateStep, setDeleteByDateStep] = useState<'form' | 'confirm'>('form');
+
   const [editFormData, setEditFormData] = useState({
     fecha: "",
     tipoMovimiento: "",
@@ -67,7 +76,7 @@ export default function VisualizarPage() {
 
   // Bloqueo estricto de scroll en móviles al abrir modales
   useEffect(() => {
-    if (showFilters || showEditModal || showDeleteConfirm || showLogoutConfirm) {
+    if (showFilters || showEditModal || showDeleteConfirm || showLogoutConfirm || showDeleteByDateModal) {
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
     } else {
@@ -78,7 +87,7 @@ export default function VisualizarPage() {
       document.documentElement.style.overflow = '';
       document.body.style.overflow = ''; 
     };
-  }, [showFilters, showEditModal, showDeleteConfirm, showLogoutConfirm]);
+  }, [showFilters, showEditModal, showDeleteConfirm, showLogoutConfirm, showDeleteByDateModal]);
 
   const fetchMovimientos = useCallback(async () => {
     setLoading(true);
@@ -245,6 +254,44 @@ export default function VisualizarPage() {
       moneda: "", montoExacto: "", montoMin: "", montoMax: "",
       tipo_movimiento: "", categoriaSelect: "", categoriaOtro: ""
     });
+  };
+
+  const closeDeleteByDateModal = () => {
+    setShowDeleteByDateModal(false);
+    setDeleteByDateMode('exacta');
+    setDeleteFechaExacta('');
+    setDeleteFechaDesde('');
+    setDeleteFechaHasta('');
+    setDeleteByDateStep('form');
+  };
+
+  // Calcula los registros afectados según la selección actual
+  const movimientosAEliminarPorFecha = movimientos.filter(m => {
+    if (m.empresa !== empresaId) return false;
+    if (deleteByDateMode === 'exacta') {
+      return deleteFechaExacta && m.fecha === deleteFechaExacta;
+    } else {
+      const cumpleDesde = !deleteFechaDesde || m.fecha >= deleteFechaDesde;
+      const cumpleHasta = !deleteFechaHasta || m.fecha <= deleteFechaHasta;
+      return cumpleDesde && cumpleHasta && (!!deleteFechaDesde || !!deleteFechaHasta);
+    }
+  });
+
+  const handleDeleteByDate = async () => {
+    if (movimientosAEliminarPorFecha.length === 0) return;
+    setIsDeletingByDate(true);
+    try {
+      const ids = movimientosAEliminarPorFecha.map(m => m.id);
+      const { error } = await dbClient.from("movimientos").delete().in("id", ids);
+      if (error) throw error;
+      setMovimientos(prev => prev.filter(m => !ids.includes(m.id)));
+      closeDeleteByDateModal();
+    } catch (err) {
+      console.error(err);
+      alert("Error al eliminar los registros.");
+    } finally {
+      setIsDeletingByDate(false);
+    }
   };
 
   const movimientosEmpresaActual = movimientos.filter(m => m.empresa === empresaId);
@@ -542,6 +589,12 @@ export default function VisualizarPage() {
               className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100 rounded-md text-xs font-bold uppercase tracking-wider transition-colors shadow-sm text-center"
             >
               Filtrar
+            </button>
+            <button
+              onClick={() => { setShowDeleteByDateModal(true); setDeleteByDateStep('form'); }}
+              className="flex-1 sm:flex-none px-4 py-2.5 bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 rounded-md text-xs font-bold uppercase tracking-wider transition-colors shadow-sm text-center"
+            >
+              Eliminar por Fecha
             </button>
           </div>
         </div>
@@ -898,6 +951,163 @@ export default function VisualizarPage() {
                   </div>
                 </form>
             </div>
+        </div>
+      )}
+
+      {/* MODAL: ELIMINAR REGISTROS POR FECHA */}
+      {showDeleteByDateModal && (
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60] animate-fade-in">
+          <div className="bg-white w-full max-w-md rounded-2xl border border-gray-200 p-6 shadow-2xl relative">
+            
+            {/* Botón cerrar */}
+            <button
+              onClick={closeDeleteByDateModal}
+              disabled={isDeletingByDate}
+              className="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 font-bold text-lg transition-colors disabled:opacity-50"
+            >
+              ✕
+            </button>
+
+            {deleteByDateStep === 'form' ? (
+              <>
+                {/* Ícono */}
+                <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+
+                <h2 className="text-xl font-bold text-gray-900 mb-1 text-center">Eliminar por Fecha</h2>
+                <p className="text-sm text-gray-500 mb-5 text-center font-medium">Seleccioná una fecha o rango para eliminar registros en lote.</p>
+
+                {/* Toggle modo */}
+                <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-lg mb-5 border border-gray-200">
+                  <button
+                    onClick={() => { setDeleteByDateMode('exacta'); setDeleteFechaDesde(''); setDeleteFechaHasta(''); }}
+                    className={`py-2 text-sm font-semibold rounded-md transition-all ${deleteByDateMode === 'exacta' ? 'bg-white text-red-700 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Fecha Exacta
+                  </button>
+                  <button
+                    onClick={() => { setDeleteByDateMode('rango'); setDeleteFechaExacta(''); }}
+                    className={`py-2 text-sm font-semibold rounded-md transition-all ${deleteByDateMode === 'rango' ? 'bg-white text-red-700 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Rango de Fechas
+                  </button>
+                </div>
+
+                {/* Inputs */}
+                {deleteByDateMode === 'exacta' ? (
+                  <div className="mb-5">
+                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Fecha</label>
+                    <div className="relative flex items-center">
+                      <input
+                        type="date"
+                        value={deleteFechaExacta}
+                        onChange={e => setDeleteFechaExacta(e.target.value)}
+                        className={`custom-date-input ${inputBaseClass} relative z-10`}
+                      />
+                      <span className={`absolute left-[0.75rem] top-1/2 -translate-y-1/2 pointer-events-none z-20 text-sm ${!deleteFechaExacta ? 'text-gray-400' : 'text-gray-900'}`}>
+                        {getPlaceholderFecha(deleteFechaExacta)}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 mb-5">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Desde</label>
+                      <div className="relative flex items-center">
+                        <input
+                          type="date"
+                          value={deleteFechaDesde}
+                          onChange={e => setDeleteFechaDesde(e.target.value)}
+                          className={`custom-date-input ${inputBaseClass} relative z-10`}
+                        />
+                        <span className={`absolute left-[0.75rem] top-1/2 -translate-y-1/2 pointer-events-none z-20 text-sm ${!deleteFechaDesde ? 'text-gray-400' : 'text-gray-900'}`}>
+                          {getPlaceholderFecha(deleteFechaDesde)}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Hasta</label>
+                      <div className="relative flex items-center">
+                        <input
+                          type="date"
+                          value={deleteFechaHasta}
+                          onChange={e => setDeleteFechaHasta(e.target.value)}
+                          className={`custom-date-input ${inputBaseClass} relative z-10`}
+                        />
+                        <span className={`absolute left-[0.75rem] top-1/2 -translate-y-1/2 pointer-events-none z-20 text-sm ${!deleteFechaHasta ? 'text-gray-400' : 'text-gray-900'}`}>
+                          {getPlaceholderFecha(deleteFechaHasta)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Previsualización */}
+                <div className={`rounded-xl p-3 mb-5 border text-center text-sm font-semibold transition-colors ${movimientosAEliminarPorFecha.length > 0 ? 'bg-red-50 border-red-200 text-red-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
+                  {movimientosAEliminarPorFecha.length > 0
+                    ? `⚠️ Se eliminarán ${movimientosAEliminarPorFecha.length} registro${movimientosAEliminarPorFecha.length !== 1 ? 's' : ''}`
+                    : 'Sin registros para la fecha seleccionada'}
+                </div>
+
+                {/* Botones */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={closeDeleteByDateModal}
+                    className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => setDeleteByDateStep('confirm')}
+                    disabled={movimientosAEliminarPorFecha.length === 0}
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Continuar
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Paso 2: Confirmación final */}
+                <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </div>
+
+                <h2 className="text-xl font-bold text-gray-900 mb-2 text-center">¿Confirmar eliminación?</h2>
+                <p className="text-sm text-gray-500 mb-2 text-center font-medium">
+                  {deleteByDateMode === 'exacta'
+                    ? `Vas a eliminar todos los registros del ${formatearFechaEs(deleteFechaExacta)}.`
+                    : `Vas a eliminar todos los registros ${deleteFechaDesde ? `desde el ${formatearFechaEs(deleteFechaDesde)}` : ''} ${deleteFechaHasta ? `hasta el ${formatearFechaEs(deleteFechaHasta)}` : ''}.`}
+                </p>
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-5 text-center">
+                  <span className="text-red-700 font-bold text-base">{movimientosAEliminarPorFecha.length} registro{movimientosAEliminarPorFecha.length !== 1 ? 's' : ''} serán eliminados permanentemente.</span>
+                  <p className="text-xs text-red-500 mt-1 font-medium">Esta acción no se puede deshacer.</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setDeleteByDateStep('form')}
+                    disabled={isDeletingByDate}
+                    className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    Volver
+                  </button>
+                  <button
+                    onClick={handleDeleteByDate}
+                    disabled={isDeletingByDate}
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors shadow-sm disabled:opacity-50"
+                  >
+                    {isDeletingByDate ? 'Eliminando...' : `Sí, eliminar ${movimientosAEliminarPorFecha.length}`}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
 
